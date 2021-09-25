@@ -1,0 +1,5 @@
+app:
+   endpoint:
+      get-by-name:
+         url: https://www.transfermarkt.pt/schnellsuche/ergebnis/schnellsuche?Spieler_page={pageNumber}&ajax=yw0&query={name}
+         httpMethod: GET

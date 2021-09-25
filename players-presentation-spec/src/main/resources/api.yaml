@@ -1,0 +1,42 @@
+openapi: "3.0.0"
+info:
+   version: 0.0.1-SNAPSHOT
+   title: Players API
+   license: 
+      name: MIT
+servers:
+   - url: http:localhost:8080/
+paths:
+   /players:
+      get:
+         summary: Get by name
+         operationId: getByName
+         tags:
+            - players
+         parameters:
+            - name: name
+              in: query
+              description: name of player
+              required: true
+              schema:
+                 type: string
+            - name: pageNumber
+              in: query
+              description: number of page (page-size = 10)
+              required: false
+              schema:
+                 type: integer
+                 format: int32
+         responses:
+            '200':
+               description: response page with records
+               headers:
+                  TOTAL-RECORDS:
+                     description: total of records
+                     schema:
+                        type: integer
+                        format: int32
+               content:
+                  application/json:
+                     schema:
+                        type: object
