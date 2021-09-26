@@ -2,7 +2,7 @@ package com.thiagoti.poc.transfermarkt.players.api.integrations;
 
 import org.springframework.data.domain.Page;
 
-import com.thiagoti.poc.transfermarkt.players.api.domain.Player;
+import com.thiagoti.poc.transfermarkt.players.api.domain.GetByName;
 
 public interface GetByNameProcessor {
 
@@ -12,6 +12,6 @@ public interface GetByNameProcessor {
 	
 	public static final String PARAM_PAGE_NUMBER = "{pageNumber}";
 	
-	Page<Player> process(String name, Integer pageNumber);
+	Page<GetByName> process(String name, Integer pageNumber);
 	
 }

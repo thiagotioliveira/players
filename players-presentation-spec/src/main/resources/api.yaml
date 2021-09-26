@@ -40,3 +40,24 @@ paths:
                   application/json:
                      schema:
                         type: object
+   /players/{id}:
+      get:
+         summary: Get by Id
+         operationId: getById
+         tags:
+            - players
+         parameters:
+            - name: id
+              in: path
+              description: id of player
+              required: true
+              schema:
+                 type: integer
+                 format: int64
+         responses:
+            '200':
+               description: response page with record
+               content:
+                  application/json:
+                     schema:
+                        type: object

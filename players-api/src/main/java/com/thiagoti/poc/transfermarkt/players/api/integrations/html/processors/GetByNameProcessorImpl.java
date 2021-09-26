@@ -13,7 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import com.thiagoti.poc.transfermarkt.players.api.config.Endpoint;
-import com.thiagoti.poc.transfermarkt.players.api.domain.Player;
+import com.thiagoti.poc.transfermarkt.players.api.domain.GetByName;
 import com.thiagoti.poc.transfermarkt.players.api.integrations.GetByNameProcessor;
 import com.thiagoti.poc.transfermarkt.players.api.integrations.HtmlParser;
 
@@ -23,60 +23,63 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GetByNameProcessorImpl implements GetByNameProcessor {
 
-	private final HtmlParser htmlParser;
+  private final HtmlParser htmlParser;
 
-	private final Endpoint getByNameEndpoint;
+  private final Endpoint getByNameEndpoint;
 
-	@Override
-	public Page<Player> process(String name, Integer pageNumber){
-		try {
-		
-			List<Player> list = new ArrayList<>();
+  @Override
+  public Page<GetByName> process(String name, Integer pageNumber) {
+    try {
 
-			Document document = htmlParser.get(getByNameEndpoint.getUrl().replace(PARAM_NAME, name.replaceAll(" ", "+")).replace(PARAM_PAGE_NUMBER, Integer.valueOf(pageNumber + 1).toString()));
+      List<GetByName> list = new ArrayList<>();
 
-			Element divTarget = document.getElementsByClass("row").get(5);
-			
-			Element playersPage = divTarget.getElementsByTag("tbody").get(0);
+      Document document = htmlParser.get(
+          getByNameEndpoint.getUrl().replace(PARAM_NAME, name.replaceAll(" ", "+")).replace(PARAM_PAGE_NUMBER, Integer.valueOf(pageNumber + 1).toString()));
 
-			addPlayer(playersPage, list);
+      Element divTarget = document.getElementsByClass("row").get(5);
 
-			return new PageImpl<>(list, PageRequest.of(pageNumber, PAGE_SIZE), Long.valueOf(divTarget.getElementsByClass("table-header").text().replaceAll("\\D", "")));
-			
-		} catch (Exception e) {
-			throw new InternalError(e);
-		}
-	}
+      Element playersPage = divTarget.getElementsByTag("tbody").get(0);
 
-	private void addPlayer(Element root, List<Player> list) {
+      addPlayer(playersPage, list);
 
-		Elements rowsOdd = root.getElementsByClass("odd");
-		Elements rowsEven = root.getElementsByClass("even");
+      return new PageImpl<>(list, PageRequest.of(pageNumber, PAGE_SIZE),
+          Long.valueOf(divTarget.getElementsByClass("table-header").text().replaceAll("\\D", "")));
 
-		Element[] array = new Element[rowsOdd.size() + rowsEven.size()];
-		
-		if(rowsOdd.size() > 0) {
-			for (int i = 0, j = 0; i < rowsOdd.size(); i++, j += 2) {
-				array[j] = rowsOdd.get(i);				
-			}
-		}
-		if(rowsEven.size() > 0) {
-			for (int i = 0, j = 1; i < rowsEven.size(); i++, j += 2) {
-				array[j] = rowsEven.get(i);				
-			}
-		}
+    } catch (Exception e) {
+      throw new InternalError(e);
+    }
+  }
 
-		Arrays.stream(array).forEach(p -> {
-			Player player = new Player();
+  private void addPlayer(Element root, List<GetByName> list) {
 
-			Element imgInfo = p.getElementsByTag("td").get(0).getElementsByTag("a").get(0).getElementsByTag("img")
-					.get(0);
-			player.setImage(imgInfo.attr("src"));
-			player.setName(imgInfo.attr("title"));
-			
-			player.setPosition(p.getElementsByClass("zentriert").get(0).text());
-			player.setTeam(p.getElementsByClass("zentriert").get(1).getElementsByAttribute("alt").attr("alt"));
-			
+    Elements rowsOdd = root.getElementsByClass("odd");
+    Elements rowsEven = root.getElementsByClass("even");
+
+    Element[] array = new Element[rowsOdd.size() + rowsEven.size()];
+
+    if (rowsOdd.size() > 0) {
+      for (int i = 0, j = 0; i < rowsOdd.size(); i++, j += 2) {
+        array[j] = rowsOdd.get(i);
+      }
+    }
+    if (rowsEven.size() > 0) {
+      for (int i = 0, j = 1; i < rowsEven.size(); i++, j += 2) {
+        array[j] = rowsEven.get(i);
+      }
+    }
+
+    Arrays.stream(array).forEach(p -> {
+      GetByName player = new GetByName();
+      
+      player.setId(Long.valueOf(p.getElementsByTag("td").get(0).getElementsByTag("a").get(1).attr("id")));
+
+      Element imgInfo = p.getElementsByTag("td").get(0).getElementsByTag("a").get(0).getElementsByTag("img").get(0);
+      player.setImage(imgInfo.attr("src"));
+      player.setName(imgInfo.attr("title"));
+
+      player.setPosition(p.getElementsByClass("zentriert").get(0).text());
+      player.setTeam(p.getElementsByClass("zentriert").get(1).getElementsByAttribute("alt").attr("alt"));
+
       String age = p.getElementsByClass("zentriert").get(2).text();
       try {
         player.setAge(Integer.valueOf(age));
@@ -84,16 +87,16 @@ public class GetByNameProcessorImpl implements GetByNameProcessor {
         player.setAge(null);
       }
 
-			Elements nacionalities = p.getElementsByClass("zentriert").get(3).getElementsByTag("img");
-			
-			nacionalities.forEach(n -> player.getNationalities().add(n.attr("title")));
-			
-			player.setPrice(p.getElementsByClass("rechts hauptlink").text());
-			player.setBusinessBroker(p.getElementsByClass("rechts").get(1).text());
-			
-			list.add(player);
-		});
+      Elements nacionalities = p.getElementsByClass("zentriert").get(3).getElementsByTag("img");
 
-	}
+      nacionalities.forEach(n -> player.getNationalities().add(n.attr("title")));
+
+      player.setPrice(p.getElementsByClass("rechts hauptlink").text());
+      player.setBusinessBroker(p.getElementsByClass("rechts").get(1).text());
+
+      list.add(player);
+    });
+
+  }
 
 }

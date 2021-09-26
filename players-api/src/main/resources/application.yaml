@@ -3,3 +3,6 @@ app:
       get-by-name:
          url: https://www.transfermarkt.pt/schnellsuche/ergebnis/schnellsuche?Spieler_page={pageNumber}&ajax=yw0&query={name}
          httpMethod: GET
+      get-by-id:
+         url: https://www.transfermarkt.pt/somestring/profil/spieler/{id}
+         httpMethod: GET

@@ -13,4 +13,10 @@ public class EndpointConfig {
 		return new Endpoint();
 	}
 	
+  @Bean
+  @ConfigurationProperties(prefix = "app.endpoint.get-by-id")
+  public Endpoint getByIdEndpoint() {
+    return new Endpoint();
+  }
+
 }
