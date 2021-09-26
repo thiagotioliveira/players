@@ -1,5 +1,0 @@
-.openapi-generator-ignore
-README.md
-pom.xml
-src/main/java/com/thiagoti/poc/transfermarkt/players/spec/ApiUtil.java
-src/main/java/com/thiagoti/poc/transfermarkt/players/spec/PlayersApi.java
