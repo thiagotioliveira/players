@@ -76,8 +76,14 @@ public class GetByNameProcessorImpl implements GetByNameProcessor {
 			
 			player.setPosition(p.getElementsByClass("zentriert").get(0).text());
 			player.setTeam(p.getElementsByClass("zentriert").get(1).getElementsByAttribute("alt").attr("alt"));
-			player.setAge(Integer.valueOf(p.getElementsByClass("zentriert").get(2).text()));
 			
+      String age = p.getElementsByClass("zentriert").get(2).text();
+      try {
+        player.setAge(Integer.valueOf(age));
+      } catch (NumberFormatException e) {
+        player.setAge(null);
+      }
+
 			Elements nacionalities = p.getElementsByClass("zentriert").get(3).getElementsByTag("img");
 			
 			nacionalities.forEach(n -> player.getNationalities().add(n.attr("title")));
